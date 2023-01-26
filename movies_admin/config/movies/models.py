@@ -73,7 +73,7 @@ class PersonFilmwork(UUIDMixin):
 class Filmwork(UUIDMixin, TimeStampedMixin):
     TYPE_CHOICES = [('MOV', 'movie'), ('TVS', 'tv_show')]
     title = models.CharField('title', max_length=255)
-
+    creation_date = models.DateField('Creation_date', blank=True)
     description = models.TextField('description', blank=True)
     rating = models.FloatField('Rating', blank=True,
                                validators=[MinValueValidator(0),

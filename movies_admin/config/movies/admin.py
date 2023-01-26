@@ -1,7 +1,4 @@
 from django.contrib import admin
-
-# Register your models here.
-from django.contrib import admin
 from .models import Genre, Filmwork, GenreFilmwork, Person, PersonFilmwork
 
 
@@ -24,8 +21,11 @@ class FilmworkAdmin(admin.ModelAdmin):
         GenreFilmworkInline,
         PersonFilmworkInline,
     )
+    list_display = ('title', 'type', 'creation_date', 'rating',)
 
-    # Отображение полей в списк
+    list_filter = ('type',)
+
+    search_fields = ('title', 'description', 'id')
 
 
 @admin.register(Person)
