@@ -1,9 +1,9 @@
-from django.db import models
-
 # Create your models here.
 import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+
+from django.utils.translation import gettext_lazy as _
 
 
 class TimeStampedMixin(models.Model):
@@ -63,7 +63,6 @@ class Person(UUIDMixin, TimeStampedMixin):
 class PersonFilmwork(UUIDMixin):
     film_work = models.ForeignKey('Filmwork', on_delete=models.CASCADE)
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
-    role = models.CharField('role', null=True, max_length=255)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -72,7 +71,7 @@ class PersonFilmwork(UUIDMixin):
 
 class Filmwork(UUIDMixin, TimeStampedMixin):
     TYPE_CHOICES = [('MOV', 'movie'), ('TVS', 'tv_show')]
-    title = models.CharField('title', max_length=255)
+    title = models.CharField(_('title'), max_length=255)
     creation_date = models.DateField('Creation_date', blank=True)
     description = models.TextField('description', blank=True)
     rating = models.FloatField('Rating', blank=True,
