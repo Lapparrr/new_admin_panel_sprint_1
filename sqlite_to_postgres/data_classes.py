@@ -35,24 +35,24 @@ class Genre:
 @dataclass
 class PersonFilmWork:
     role: str
-    person_id: Person.id
-    film_id: FilmWork.id
     created_at: str
     id: uuid.UUID = field(default_factory=uuid.uuid4)
+    film_id: uuid.UUID = field(default_factory=uuid.uuid4)
+    person_id: uuid.UUID = field(default_factory=uuid.uuid4)
 
 
 @dataclass
 class GenreFilmWork:
-    film_id: FilmWork.id
-    genre_id: Genre.id
     created_at: str
     id: uuid.UUID = field(default_factory=uuid.uuid4)
+    genre_id: uuid.UUID = field(default_factory=uuid.uuid4)
+    film_id: uuid.UUID = field(default_factory=uuid.uuid4)
 
 
 @dataclass
 class Data:
-    film_work: list  # FilmWork
-    person: list  # Person
-    genre: list  # Genre
-    person_film_work: list  # PersonFilmWork
-    genre_film_work: list  # GenreFilmWork
+    person: Person = field(default_factory=list)
+    genre: Genre = field(default_factory=list)
+    person_film_work: PersonFilmWork = field(default_factory=list)
+    genre_film_work: GenreFilmWork = field(default_factory=list)
+    film_work: FilmWork = field(default_factory=list)

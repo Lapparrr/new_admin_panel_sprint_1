@@ -23,6 +23,15 @@ class PostgresSaver:
         self.__pg_conn = pg_conn
 
     def save_all_data(self, data: Data):
+        cursor = self.__pg_conn.cursor()
+
+        args = ','.join(
+            cursor.mogrify("(%s, %s)", item).decode() for item in data.person)
+        cursor.execute(f"""
+            INSERT INTO content.temp_table ()
+            VALUES {args};
+            """
+                       )
         pass
 
 
@@ -37,46 +46,39 @@ class SQLiteExtractor:
             data[key] = []
         return data
 
-    def extract_movies(self, table_names: list):
-        #TODO создать объекты датаклассов и в них сохранять данные с таблиц
+    def extract_movies(self):
         curs = self.__con.cursor()
-        data = self.dict_factory(table_names)
-        for table in data:
+        data = Data()
+        for table, obj in data.__annotations__.items():
             list_table = []
             # Reading table
             curs.execute(f"SELECT * FROM {table}")
             result = curs.fetchall()
             for row in result:
                 # Reading rows
-                list_table.append(dict(row))
-            data[table] = list_table
+                list_table.append(obj(dict(row)))
+            data.table = list_table
         return data
 
 
-db_path = 'db.sqlite'
-table_names = ['film_work', 'genre', 'person', 'person_film_work',
-               'genre_film_work']
-
-
-
 def load_from_sqlite(connection: sqlite3.Connection,
-                     pg_conn: _connection, table_names
-                     ):
+                     pg_conn: _connection):
     """Основной метод загрузки данных из SQLite в Postgres"""
     postgres_saver = PostgresSaver(pg_conn)
     sqlite_extractor = SQLiteExtractor(connection)
 
-    data = sqlite_extractor.extract_movies(table_names)
+    data = sqlite_extractor.extract_movies()
     postgres_saver.save_all_data(data)
 
 
 if __name__ == '__main__':
+    db_path = 'db.sqlite'
     table_name = ['film_work', 'genre', 'person', 'person ']
     dsl = dict(dbname='movies_database',
                user='app',
                password='123qwe',
                host='127.0.0.1',
-               port=5432
+               port=5432,
                )
     with sqlite3_con('db.sqlite') as sqlite_conn, \
             psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn:

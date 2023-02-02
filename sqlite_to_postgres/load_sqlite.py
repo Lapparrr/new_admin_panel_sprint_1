@@ -31,10 +31,7 @@ with psycopg2.connect(**dsn) as conn, conn.cursor() as cursor:
     # Это позволяет без опаски передавать параметры на вставку
     # mogrify позаботится об экранировании и подстановке нужных типовs
     # Именно поэтому можно склеить тело запроса с подготовленными параметрами
-    data = [
-        ('b8531efb-c49d-4111-803f-725c3abc0f5e', 'Василий Васильевич'),
-        ('2d5c50d0-0bb4-480c-beab-ded6d0760269', 'Пётр Петрович')
-    ]
+    data = data.t
     args = ','.join(cursor.mogrify("(%s, %s)", item).decode() for item in data)
     cursor.execute(f"""
     INSERT INTO content.temp_table (id, name)
