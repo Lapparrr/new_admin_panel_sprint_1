@@ -4,8 +4,7 @@ from contextlib import contextmanager
 import psycopg2
 from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictCursor
-
-from data_classes import Data
+from data_classes import Genre, FilmWork, PersonFilmWork, Person, GenreFilmWork
 
 
 @contextmanager
@@ -22,43 +21,54 @@ class PostgresSaver:
     def __init__(self, pg_conn: _connection):
         self.__pg_conn = pg_conn
 
-    def save_all_data(self, data: Data):
+    def save_all_data(self, data: list):
         cursor = self.__pg_conn.cursor()
 
+        data = {'person': [
+            Person('Василий Васильевич', '12-05-2001', '12-10-2001',
+                   'b8531efb-c49d-4111-803f-725c3abc0f5e'),
+            Person('Василий Васильевич', '12-05-2001',
+                   '12-10-2001',
+                   'b8531efb-c49d-4111-45665-725c3ab0f5e')
+        ],
+
+        }
+        attr_table = ['']
+        count_args = len(data[0])
+        mogrify_arg = "%s, " * count_args
         args = ','.join(
-            cursor.mogrify("(%s, %s)", item).decode() for item in data.person)
+            cursor.mogrify(f"({mogrify_arg})", item).decode() for item in data)
         cursor.execute(f"""
-            INSERT INTO content.temp_table ()
-            VALUES {args};
-            """
-                       )
-        pass
+                INSERT INTO content.temp_table (id, name) 
+                VALUES {args}
+                """)  # Исправить загружаемые таблицы
 
 
 class SQLiteExtractor:
+    table_dataclass = {"person": Person,
+                       "genre": Genre,
+                       "person_film_work": PersonFilmWork,
+                       "genre_film_work": GenreFilmWork,
+                       "film_work": FilmWork,
+                       }
+
     def __init__(self, connection: sqlite3.Connection):
         self.__con = connection
 
-    @staticmethod
-    def dict_factory(table_names: list) -> dict:
+    def extract_movies(self) -> dict:
         data = {}
-        for key in table_names:
-            data[key] = []
-        return data
-
-    def extract_movies(self):
         curs = self.__con.cursor()
-        data = Data()
-        for table, obj in data.__annotations__.items():
-            list_table = []
-            # Reading table
+        for table, class_obj in self.table_dataclass.items():
             curs.execute(f"SELECT * FROM {table}")
+            list_obj = []
             result = curs.fetchall()
             for row in result:
-                # Reading rows
-                list_table.append(obj(dict(row)))
-            data.table = list_table
+                for attr in class_obj.__annotations__:
+                    class_obj.attr = row[attr]
+                list_obj.append(class_obj)
+            data[table] = list_obj.copy()
         return data
+        # data = {table_name: [obj_data_class, ...], ... }
 
 
 def load_from_sqlite(connection: sqlite3.Connection,
@@ -69,17 +79,3 @@ def load_from_sqlite(connection: sqlite3.Connection,
 
     data = sqlite_extractor.extract_movies()
     postgres_saver.save_all_data(data)
-
-
-if __name__ == '__main__':
-    db_path = 'db.sqlite'
-    table_name = ['film_work', 'genre', 'person', 'person ']
-    dsl = dict(dbname='movies_database',
-               user='app',
-               password='123qwe',
-               host='127.0.0.1',
-               port=5432,
-               )
-    with sqlite3_con('db.sqlite') as sqlite_conn, \
-            psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn:
-        load_from_sqlite(sqlite_conn, pg_conn, table_name)
