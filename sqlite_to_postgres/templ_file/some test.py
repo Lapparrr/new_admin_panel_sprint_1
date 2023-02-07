@@ -85,8 +85,9 @@
 #                 list_table.append(obj(dict(row)))
 #             data.table = list_table
 #         return data
-#
-#
+
+
+
 import io
 
 import psycopg2
@@ -106,7 +107,7 @@ with psycopg2.connect(**dsn) as conn, conn.cursor() as cursor:
     # Очищаем таблицу в БД, чтобы загружать данные в пустую таблицу
     # cursor.execute("""TRUNCATE content.temp_table""")
 
-    data = {'temp_table': [
+    data = {'person': [
         Person('Василий Васильевич', '12-05-2001', '12-10-2001',
                'b8531efb-c49d-4111-803f-725c3abc0f5e'),
         Person('Василий Васильевич', '12-05-2001',
@@ -115,19 +116,22 @@ with psycopg2.connect(**dsn) as conn, conn.cursor() as cursor:
     ],
 
     }
+    # data = {table_name: [obj_data_class, ...], ... }
     for table in data:
+        row_value = []
         for row in data[table]:
-            attr_table = ','.join(row.__dict__)
-            count_args = len(row.__dict__)
-            mogrify_arg = "%s, " * count_args
-            args = ','.join(
-                cursor.mogrify(f"({mogrify_arg})", item).decode() for item in
-                row.__dict__.values()
-            )
+            # Сохранить в лист свойства обьектов
+            row_value.append(tuple(row.__dict__.values()))
+        args_mogrify = ','.join('%s' for i in row.__dict__)
+        attr_table = row.__dict__
+        print(attr_table)
+        args = ','.join(cursor.mogrify(f"({args_mogrify})", item).decode() for item in row_value)
+        print(args)
         cursor.execute(f"""
-                            INSERT INTO content.temp_table ({attr_table}) 
-                            VALUES {args}
-                            """)
+            INSERT INTO content.{table}
+            VALUES {args}
+            ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name
+            """)
 
     #TODO какие-то ошибки. Нужно преобразовать словарь в SQL запрос и отправить в временную таблицу.
     # Преобразовать таблицу под данные что выше.
