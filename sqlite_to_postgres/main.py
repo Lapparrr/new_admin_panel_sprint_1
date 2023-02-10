@@ -14,4 +14,4 @@ if __name__ == '__main__':
            }
     with sqlite3_con('db.sqlite') as sqlite_conn, \
             psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn:
-        load_from_sqlite(sqlite_conn, pg_conn, table_name)
+        load_from_sqlite(sqlite_conn, pg_conn)

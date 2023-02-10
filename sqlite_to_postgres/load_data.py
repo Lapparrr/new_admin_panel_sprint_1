@@ -21,27 +21,27 @@ class PostgresSaver:
     def __init__(self, pg_conn: _connection):
         self.__pg_conn = pg_conn
 
-    def save_all_data(self, data: list):
+    def save_all_data(self, data: dict):
         cursor = self.__pg_conn.cursor()
-
-        data = {'person': [
-            Person('Василий Васильевич', '12-05-2001', '12-10-2001',
-                   'b8531efb-c49d-4111-803f-725c3abc0f5e'),
-            Person('Василий Васильевич', '12-05-2001',
-                   '12-10-2001',
-                   'b8531efb-c49d-4111-45665-725c3ab0f5e')
-        ],
-
-        }
-        attr_table = ['']
-        count_args = len(data[0])
-        mogrify_arg = "%s, " * count_args
+        # Выгрузка таблицы Person
+        person = data['person']
+        # [obj1, ...,]
+        mogrify_arg = ','.join('%s' for i in person[0].__dict__)
+        print(person[0].__dict__.values())
         args = ','.join(
-            cursor.mogrify(f"({mogrify_arg})", item).decode() for item in data)
-        cursor.execute(f"""
-                INSERT INTO content.temp_table (id, name) 
-                VALUES {args}
-                """)  # Исправить загружаемые таблицы
+            cursor.mogrify(f"({mogrify_arg})",tuple(item.__dict__.values())).decode() for item in
+            person)
+        print(args)
+        cursor.execute(f"""INSERT INTO content.person (id, full_name, created_at, updated_at)
+                            VALUES {args}
+            ON CONFLICT (id) DO UPDATE SET full_name=EXCLUDED.full_name
+            """)
+        print('Загрузка завершена')
+        # Выгрузка таблицы Genre
+
+        # Выгрузка таблицы person_film_work
+        # Выгрузка таблицы genre_film_work
+        # Выгрузка таблицы film_work
 
 
 class SQLiteExtractor:
@@ -62,11 +62,12 @@ class SQLiteExtractor:
             curs.execute(f"SELECT * FROM {table}")
             list_obj = []
             result = curs.fetchall()
+            row: object
             for row in result:
-                for attr in class_obj.__annotations__:
-                    class_obj.attr = row[attr]
-                list_obj.append(class_obj)
+                # print(tuple(row))
+                list_obj.append(class_obj(*tuple(row)))
             data[table] = list_obj.copy()
+        print(data)
         return data
         # data = {table_name: [obj_data_class, ...], ... }
 

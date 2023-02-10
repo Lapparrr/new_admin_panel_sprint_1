@@ -121,8 +121,8 @@ with psycopg2.connect(**dsn) as conn, conn.cursor() as cursor:
             count_args = len(row.__dict__)
             mogrify_arg = "%s, " * count_args
             args = ','.join(
-                cursor.mogrify(f"({mogrify_arg})", item).decode() for item in
-                row.__dict__.values()
+                cursor.mogrify(f"({mogrify_arg})", *item.__dict__).decode() for item in
+                row
             )
         cursor.execute(f"""
                             INSERT INTO content.temp_table ({attr_table}) 
