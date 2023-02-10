@@ -69,7 +69,7 @@ class SQLiteExtractor:
             data[table] = list_obj.copy()
         print(data)
         return data
-        # data = {table_name: [obj_data_class, ...], ... }
+        # data = {table_name: [obj_data_class, ...], ... }git
 
 
 def load_from_sqlite(connection: sqlite3.Connection,
