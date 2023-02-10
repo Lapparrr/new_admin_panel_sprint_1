@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-26 13:19+0000\n"
+"POT-Creation-Date: 2023-02-10 17:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,78 @@ msgstr ""
 msgid "movies"
 msgstr "Фильмы"
 
-#: movies/models.py:77
+#: movies/models.py:25
+msgid "name"
+msgstr "Имя"
+
+#: movies/models.py:26 movies/models.py:74
+msgid "description"
+msgstr "Описание"
+
+#: movies/models.py:34
+msgid "Genre"
+msgstr "Жанр"
+
+#: movies/models.py:35
+msgid "Genres"
+msgstr "Жанры"
+
+#: movies/models.py:45
+msgid "genre_film_work"
+msgstr "Жанры"
+
+#: movies/models.py:49
+msgid "Full_name"
+msgstr "Полное имя"
+
+#: movies/models.py:56
+msgid "Person"
+msgstr "Персоналии"
+
+#: movies/models.py:57
+msgid "Persons"
+msgstr "Персоналии"
+
+#: movies/models.py:62
+msgid "Role"
+msgstr "Роль"
+
+#: movies/models.py:67
+msgid "person_film_work"
+msgstr "Лица, участвующие в ленте"
+
+#: movies/models.py:71
+msgid "movie"
+msgstr "Фильм"
+
+#: movies/models.py:71
+msgid "tv_show"
+msgstr "ТВ шоу"
+
+#: movies/models.py:72
 msgid "title"
-msgstr "Название"
+msgstr "Заголовок"
+
+#: movies/models.py:73
+msgid "Creation_date"
+msgstr "Дата создания"
+
+#: movies/models.py:75
+msgid "Rating"
+msgstr "Рейтинг"
+
+#: movies/models.py:78
+msgid "file_path"
+msgstr "Путь к файлу"
+
+#: movies/models.py:79
+msgid "type"
+msgstr "Тип"
+
+#: movies/models.py:89
+msgid "Filmwork"
+msgstr "Фильм"
+
+#: movies/models.py:90
+msgid "Filmworks"
+msgstr "Фильмы"
