@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from typing import Type
 
 from psycopg2.extensions import connection as _connection
+
 from sqlite_to_postgres.data_classes import Genre, PersonFilmWork, Person, \
     GenreFilmWork, FilmWork
 
@@ -17,6 +18,12 @@ def sqlite3_con(db_path: str):
 
 class PostgresSaver:
     INSERT_SIZE = 5
+    table_dataclass = {"person": Person,
+                       "genre": Genre,
+                       "person_film_work": PersonFilmWork,
+                       "genre_film_work": GenreFilmWork,
+                       "film_work": FilmWork,
+                       }
 
     def __init__(self, pg_conn: _connection):
         self.__pg_conn = pg_conn
@@ -36,6 +43,21 @@ class PostgresSaver:
                 ON CONFLICT (id) DO NOTHING
                 """)
         print('Загрузка завершена')
+
+    def extract_movies(self) -> dict:
+        data = {}
+        curs = self.__pg_conn.cursor()
+        type_data: Type[
+            Genre | PersonFilmWork | Person | GenreFilmWork | FilmWork]
+        for table, type_data in self.table_dataclass.items():
+            curs.execute(f"SELECT * FROM content.{table}")
+            data_value = []
+            result = curs.fetchall()
+            row: object
+            for row in result:
+                data_value.append(type_data(**dict(row)))
+            data[table] = data_value.copy()
+        return data
 
 
 class SQLiteExtractor:
@@ -60,7 +82,7 @@ class SQLiteExtractor:
             result = curs.fetchall()
             row: object
             for row in result:
-                data_value.append(type_data(*tuple(row)))
+                data_value.append(type_data(**dict(row)))
             data[table] = data_value.copy()
         return data
 

@@ -5,7 +5,7 @@ from sqlite_to_postgres.load_data import sqlite3_con, load_from_sqlite
 
 if __name__ == '__main__':
     db_path = 'db.sqlite'
-    table_name = ['film_work', 'genre', 'person', 'person ']
+
     dsl = {'dbname': 'movies_database',
            'user': 'app',
            'password': '123qwe',
