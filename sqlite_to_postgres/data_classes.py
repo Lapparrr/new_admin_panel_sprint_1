@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 
 dt_format = '%Y-%m-%d %H:%M:%S.%f%z'
 
@@ -42,7 +42,6 @@ class Person:
             self.updated_at = datetime.strptime(self.updated_at, dt_format)
 
 
-
 @dataclass
 class Genre:
     id: uuid.UUID = field(default_factory=uuid.uuid4)
@@ -60,7 +59,6 @@ class Genre:
             self.updated_at = datetime.strptime(self.updated_at, dt_format)
 
 
-
 @dataclass
 class PersonFilmWork:
     id: uuid.UUID = field(default_factory=uuid.uuid4)
@@ -75,7 +73,6 @@ class PersonFilmWork:
             self.created_at = datetime.strptime(self.created_at, dt_format)
 
 
-
 @dataclass
 class GenreFilmWork:
     id: uuid.UUID = field(default_factory=uuid.uuid4)
@@ -87,5 +84,3 @@ class GenreFilmWork:
         if isinstance(self.created_at, str):
             self.created_at += '00'
             self.created_at = datetime.strptime(self.created_at, dt_format)
-
-

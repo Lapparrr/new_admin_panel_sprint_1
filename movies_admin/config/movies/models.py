@@ -1,8 +1,8 @@
 # Create your models here.
 import uuid
-from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
@@ -56,6 +56,7 @@ class Person(UUIDMixin, TimeStampedMixin):
         verbose_name = _('Person')
         verbose_name_plural = _('Persons')
 
+
 class PersonFilmwork(UUIDMixin):
     film_work = models.ForeignKey('Filmwork', on_delete=models.CASCADE)
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
@@ -76,7 +77,8 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
                                validators=[MinValueValidator(0),
                                            MaxValueValidator(100)])
     file_path = models.TextField(_('file_path'), blank=True, null=True)
-    type = models.CharField(_("type"), choices=TYPE_CHOICES, blank=True, null=True,
+    type = models.CharField(_("type"), choices=TYPE_CHOICES, blank=True,
+                            null=True,
                             max_length=30)
     genres = models.ManyToManyField(Genre, through='GenreFilmwork')
     persons = models.ManyToManyField(Person, through='PersonFilmwork')
