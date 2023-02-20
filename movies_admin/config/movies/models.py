@@ -1,4 +1,3 @@
-# Create your models here.
 import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -30,7 +29,6 @@ class Genre(UUIDMixin, TimeStampedMixin):
 
     class Meta:
         db_table = "content\".\"genre"
-        # Следующие два поля отвечают за название модели в интерфейсе
         verbose_name = _('Genre')
         verbose_name_plural = _('Genres')
 
@@ -43,6 +41,10 @@ class GenreFilmwork(UUIDMixin):
     class Meta:
         db_table = "content\".\"genre_film_work"
         verbose_name = _('genre_film_work')
+        indexes = [
+            models.UniqueConstraint(fields=['genre', 'film_work'],
+                                    name='genre_film_work_inx')
+        ]
 
 
 class Person(UUIDMixin, TimeStampedMixin):
@@ -56,6 +58,7 @@ class Person(UUIDMixin, TimeStampedMixin):
         verbose_name = _('Person')
         verbose_name_plural = _('Persons')
 
+
 class PersonFilmwork(UUIDMixin):
     film_work = models.ForeignKey('Filmwork', on_delete=models.CASCADE)
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
@@ -65,6 +68,10 @@ class PersonFilmwork(UUIDMixin):
     class Meta:
         db_table = "content\".\"person_film_work"
         verbose_name = _('person_film_work')
+        indexes = [
+            models.UniqueConstraint(fields=['role', 'person', 'film_work'],
+                                    name='film_work_person_idx')
+        ]
 
 
 class Filmwork(UUIDMixin, TimeStampedMixin):
@@ -88,3 +95,6 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         db_table = "content\".\"film_work"
         verbose_name = _('Filmwork')
         verbose_name_plural = _('Filmworks')
+        indexes = [
+            models.Index(fields=['creation_date', 'title', 'type'])
+        ]
