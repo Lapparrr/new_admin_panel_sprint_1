@@ -1,19 +1,9 @@
 import sqlite3
-from contextlib import contextmanager
-from typing import Type
 
 from psycopg2.extensions import connection as _connection
 
 from sqlite_to_postgres.data_classes import Genre, PersonFilmWork, Person, \
     GenreFilmWork, FilmWork
-
-
-@contextmanager
-def sqlite3_con(db_path: str):
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    yield conn
-    conn.close()
 
 
 class PostgresSaver:
