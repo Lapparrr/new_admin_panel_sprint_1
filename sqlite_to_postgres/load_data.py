@@ -17,7 +17,7 @@ def sqlite3_con(db_path: str):
 
 
 class PostgresSaver:
-    INSERT_SIZE = 5
+    limit = 100
     table_dataclass = {"person": Person,
                        "genre": Genre,
                        "person_film_work": PersonFilmWork,
@@ -37,12 +37,10 @@ class PostgresSaver:
                 cursor.mogrify(f"({mogrify_arg})",
                                tuple(item.__dict__.values())).decode() for item
                 in value)
-            print(table_attr, mogrify_arg)
             cursor.execute(f"""INSERT INTO content.{table} ({table_attr})
                                 VALUES {args}
                 ON CONFLICT (id) DO NOTHING
                 """)
-        print('Загрузка завершена')
 
     def extract_movies(self) -> dict:
         data = {}
@@ -52,15 +50,19 @@ class PostgresSaver:
         for table, type_data in self.table_dataclass.items():
             curs.execute(f"SELECT * FROM content.{table}")
             data_value = []
-            result = curs.fetchall()
-            row: object
-            for row in result:
-                data_value.append(type_data(**dict(row)))
-            data[table] = data_value.copy()
+            while True:
+                result = curs.fetchmany(self.limit)
+                if not result:
+                    break
+                row: object
+                for row in result:
+                    data_value.append(type_data(**dict(row)))
+                data[table] = data_value.copy()
         return data
 
 
 class SQLiteExtractor:
+    limit = 100
     table_dataclass = {"person": Person,
                        "genre": Genre,
                        "person_film_work": PersonFilmWork,
@@ -79,11 +81,14 @@ class SQLiteExtractor:
         for table, type_data in self.table_dataclass.items():
             curs.execute(f"SELECT * FROM {table}")
             data_value = []
-            result = curs.fetchall()
-            row: object
-            for row in result:
-                data_value.append(type_data(**dict(row)))
-            data[table] = data_value.copy()
+            while True:
+                result = curs.fetchmany(self.limit)
+                if not result:
+                    break
+                row: object
+                for row in result:
+                    data_value.append(type_data(**dict(row)))
+                data[table] = data_value.copy()
         return data
 
 

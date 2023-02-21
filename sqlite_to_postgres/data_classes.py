@@ -9,7 +9,7 @@ dt_format = '%Y-%m-%d %H:%M:%S.%f%z'
 class FilmWork:
     id: uuid.UUID = field(default_factory=uuid.uuid4)
     title: str = ''
-    description: str = ''
+    description: str = field(default='')
     creation_date: str = ''
     file_path: str = ''
     rating: float = field(default=0.0)
@@ -24,6 +24,10 @@ class FilmWork:
         if isinstance(self.updated_at, str):
             self.updated_at += '00'
             self.updated_at = datetime.strptime(self.updated_at, dt_format)
+        if self.description is None:
+            self.description = ''
+        if self.file_path is None:
+            self.file_path = ''
 
 
 @dataclass
@@ -57,6 +61,8 @@ class Genre:
         if isinstance(self.updated_at, str):
             self.updated_at += '00'
             self.updated_at = datetime.strptime(self.updated_at, dt_format)
+        if self.description is None:
+            self.description = ''
 
 
 @dataclass

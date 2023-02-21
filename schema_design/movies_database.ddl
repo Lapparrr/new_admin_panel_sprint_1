@@ -24,7 +24,11 @@ CREATE TABLE IF NOT EXISTS content.person_film_work (
     film_work_id uuid NOT NULL,
     person_id uuid NOT NULL,
     role TEXT NOT NULL,
-    created timestamp with time zone
+    created timestamp with time zone,
+    CONSTRAINT fk_person
+        FOREIGN KEY(person_id)
+        REFERENCES content.person (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS content.genre (
@@ -39,7 +43,11 @@ CREATE TABLE IF NOT EXISTS content.genre_film_work (
     id uuid PRIMARY KEY,
     genre_id uuid NOT NULL,
     film_work_id uuid NOT NULL,
-    created timestamp with time zone
+    created timestamp with time zone,
+    CONSTRAINT fk_person
+        FOREIGN KEY(genre_id)
+        REFERENCES content.genre (id)
+        ON DELETE CASCADE
 );
 --Индекс по дате создания фильмов
 CREATE INDEX IF NOT EXISTS film_work_creation_date_idx ON content.film_work(creation_date);
@@ -51,7 +59,7 @@ CREATE INDEX IF NOT EXISTS film_work_rating_inx ON content.film_work(rating);
 CREATE INDEX IF NOT EXISTS film_work_type_inx ON content.film_work(type);
 
 --Создание уникальный унидексов по участникам фильма и жанру
-CREATE UNIQUE INDEX IF NOT EXISTS film_work_person_idx ON content.person_film_work (film_work_id, person_id);
+CREATE UNIQUE INDEX IF NOT EXISTS film_work_person_idx ON content.person_film_work (film_work_id, person_id, role);
 CREATE UNIQUE INDEX IF NOT EXISTS genre_film_work_inx ON content.genre_film_work(film_work_id, genre_id);
 
 --psql -h 127.0.0.1 -U app -d movies_database -f movies_database.ddl

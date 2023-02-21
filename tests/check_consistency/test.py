@@ -1,13 +1,16 @@
+import os
+
 import psycopg2
 from psycopg2.extras import DictCursor
-
+from dotenv import load_dotenv
 from sqlite_to_postgres.load_data import sqlite3_con, PostgresSaver, \
     SQLiteExtractor
 
+load_dotenv()
 db_path = '../../sqlite_to_postgres/db.sqlite'
-dsl = {'dbname': 'movies_database',
-       'user': 'app',
-       'password': '123qwe',
+dsl = {'dbname': os.environ.get("DB_NAME"),
+       'user': os.environ.get('DB_USER'),
+       'password': os.environ.get('DB_PASSWORD'),
        'host': '127.0.0.1',
        'port': 5432
        }
@@ -24,7 +27,6 @@ def test_sqlite_postgres():
             rez = sqlite_curs.fetchall()
             pg_curs.execute(f"SELECT COUNT(*) FROM content.{table_name}")
             rez_pg = pg_curs.fetchall()
-            print(f'Количество строк совпадает в таблице {table_name}')
             assert list(rez[0]) == rez_pg[0]
 
 
